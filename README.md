@@ -1,86 +1,69 @@
-Ticket Event System – Azure Service Bus Integration
-1. Introduction
+##Ticket Event System – Azure Service Bus Integration
+#1. Overview
 
-The Ticket Event System demonstrates a distributed, event-driven architecture built with .NET 8, Azure Service Bus Topics, and Azure Functions.
-It simulates a ticketing workflow where events are published by one service and selectively processed by another, based on message properties.
+The Ticket Event System demonstrates an event-driven architecture using .NET 8, Azure Service Bus Topics, and Azure Functions.
+It simulates a ticketing workflow where messages are published to a Service Bus topic and processed selectively based on their properties.
+All authentication is handled through Azure Active Directory (Azure AD) instead of connection strings.
 
-The system emphasizes:
+#2. Architecture
+Components
 
-Secure, connectionless authentication using Azure Active Directory (Azure AD).
+TicketSender – .NET 8 console app that publishes Ticket messages to an Azure Service Bus topic named logtopic.
 
-Message filtering through Service Bus Topic Subscriptions.
+TicketProcessor – .NET 8 isolated Azure Function triggered by filtered messages from a topic subscription.
 
-Separation of responsibilities between publishers and subscribers.
+Topic & Subscriptions
 
-2. System Architecture
-Components Overview
-Component	Type	Description
-TicketSender	.NET 8 Console Application	Publishes Ticket messages to an Azure Service Bus topic named logtopic.
-TicketProcessor	.NET 8 Isolated Azure Function	Listens to filtered messages from the ErrorSubscriber subscription and processes them.
-Message Routing Design
+Topic: logtopic
 
-The Azure Service Bus topic logtopic has two subscriptions:
+Subscriptions:
 
-Subscription	Description	Filter Criteria
-GeneralSubscriber	Receives all messages published to the topic.	None
-ErrorSubscriber	Receives only messages where the ticket has an error state.	ticketStatus = "error" and eventPriority < 10
-Logical Flow
-TicketSender (Console Application)
-        │
-        ▼
-Azure Service Bus Namespace
-   ├── Topic: logtopic
-   │    ├── GeneralSubscriber  (no filters)
-   │    └── ErrorSubscriber    (filtered: status="error", priority<10)
-        │
-        ▼
-TicketProcessor (Azure Function)
-   - Triggered by ErrorSubscriber
-   - Processes and logs relevant messages
+GeneralSubscriber – receives all messages.
 
-3. Authentication and Security
+ErrorSubscriber – receives only messages where:
 
-This project uses Azure AD–based authentication via DefaultAzureCredential from the Azure Identity library.
-Connection strings are not used or stored anywhere.
+ticketStatus = "error"
 
-Environment	Authentication Method
-Local Development	Authenticates using the signed-in Azure user from az login.
-Azure Deployment	Authenticates using the Function App’s system-assigned managed identity.
-4. Local Development Setup
-Prerequisites
+eventPriority < 10
+
+The Azure Function listens only to ErrorSubscriber.
+
+Message Flow
+TicketSender  →  Service Bus Topic (logtopic)
+                   ├─ GeneralSubscriber (no filter)
+                   └─ ErrorSubscriber (filtered)
+                                ↓
+                        TicketProcessor (Function)
+
+#3. Authentication
+
+Local Development: Uses the signed-in Azure user (az login).
+
+Azure Deployment: Uses the Function App’s system-assigned managed identity.
+
+No connection strings are stored in code or configuration.
+
+#4. Local Setup
+Requirements
 
 Azure subscription
 
-Azure Service Bus namespace
+Service Bus namespace
 
 .NET 8 SDK
 
-Azure CLI (az)
+Azure CLI and Functions Core Tools
 
-Azure Functions Core Tools
+Steps
 
-Visual Studio Code
-
-Configuration Steps
-
-Sign in to Azure
+Sign in to Azure:
 
 az login
 
 
-Assign RBAC Role
+Assign Azure Service Bus Data Receiver role to your Azure user on the Service Bus namespace.
 
-Navigate to your Service Bus namespace in the Azure portal.
-
-Go to Access control (IAM) → Add role assignment.
-
-Role: Azure Service Bus Data Receiver
-
-Assign to: your signed-in Azure user.
-
-Update Local Function Settings
-
-TicketProcessor/local.settings.json
+Update TicketProcessor/local.settings.json:
 
 {
   "IsEncrypted": false,
@@ -92,41 +75,34 @@ TicketProcessor/local.settings.json
 }
 
 
-Run the Function Locally
+Run the Function:
 
 cd TicketProcessor
 func start
 
 
-Run the Message Publisher
+Send test messages:
 
 cd TicketSender
 dotnet run
 
 
-Messages with Status = "error" and PriorityLevel < 10 will trigger the function through the ErrorSubscriber subscription.
+Only error tickets with low priority will trigger the Function.
 
-5. Deployment to Azure
+#5. Deployment to Azure
 
-Enable Managed Identity
+Enable System-Assigned Managed Identity on the Function App.
 
-Portal → Function App → Identity → System-assigned = On.
+Assign Azure Service Bus Data Receiver role to that identity on the Service Bus namespace.
 
-Grant Permissions
-
-Portal → Service Bus Namespace → Access control (IAM).
-
-Add role assignment → Azure Service Bus Data Receiver → assign to the Function App’s managed identity.
-
-Configure Application Setting
+Add the following App Setting:
 
 servicebusnamespace1071_SERVICEBUS__fullyQualifiedNamespace = servicebusnamespace1071.servicebus.windows.net
 
 
-Redeploy the Function App
-The same code runs in Azure without modification.
+Redeploy — no code changes required.
 
-6. Project Structure
+#6. Project Structure
 ticketeventsystem/
 │
 ├── TicketSender/
@@ -137,25 +113,24 @@ ticketeventsystem/
 ├── TicketProcessor/
 │   ├── ServiceBusLogTopicTrigger.cs
 │   ├── host.json
-│   ├── local.settings.json
 │   └── TicketProcessor.csproj
 │
 └── ticketeventsystem.sln
 
-7. Technologies Used
+#7. Technologies
 
 .NET 8
 
-Azure Service Bus (Topics and Subscriptions)
+Azure Service Bus (Topics & Subscriptions)
 
-Azure Functions (Isolated Worker Model)
+Azure Functions (Isolated Worker)
 
-Azure Identity (Managed Identity & User Authentication)
-
-Azure CLI and Functions Core Tools
+Azure Identity (Managed Identity / AAD)
 
 Visual Studio Code
 
-8. Author
+Azure CLI & Functions Core Tools
+
+#8. Author
 
 Ozan Onder
