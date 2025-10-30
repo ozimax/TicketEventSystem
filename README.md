@@ -103,22 +103,7 @@ servicebusnamespace1071_SERVICEBUS__fullyQualifiedNamespace = servicebusnamespac
 
 Redeploy — no code changes required.
 
-# 6. Project Structure
-ticketeventsystem/
-│
-├── TicketSender/
-│   ├── Program.cs
-│   ├── Ticket.cs
-│   └── TicketSender.csproj
-│
-├── TicketProcessor/
-│   ├── ServiceBusLogTopicTrigger.cs
-│   ├── host.json
-│   └── TicketProcessor.csproj
-│
-└── ticketeventsystem.sln
-
-# 7. Technologies
+# 6. Technologies
 
 .NET 8
 
@@ -132,6 +117,6 @@ Visual Studio Code
 
 Azure CLI & Functions Core Tools
 
-#8. Author
+# 7. Author
 
 Ozan Onder
