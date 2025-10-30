@@ -6,10 +6,11 @@ string topicName = "logtopic";
 string nameSpaceHostName = "servicebusnamespace1071.servicebus.windows.net";
 
 List<Ticket> tickets = new List<Ticket>();
-/*tickets.Add(new Ticket { Id = 1, Name = "Computer", Status="inProgress", PriorityLevel=200});
+
+tickets.Add(new Ticket { Id = 1, Name = "Computer", Status="inProgress", PriorityLevel=200});
 tickets.Add(new Ticket { Id = 2,  Name = "Reports", Status="done", PriorityLevel=200});
-tickets.Add(new Ticket { Id = 3, Name = "Sales", Status = "error", PriorityLevel = 20 });*/
-tickets.Add(new Ticket { Id = 4, Name = "Hardware55555", Status = "error", PriorityLevel = 8 });
+tickets.Add(new Ticket { Id = 3, Name = "Sales", Status = "error", PriorityLevel = 20 });
+tickets.Add(new Ticket { Id = 4, Name = "Hardware", Status = "error", PriorityLevel = 8 });
 
 await SendMessages(tickets);
 
