@@ -1,11 +1,12 @@
-##Ticket Event System – Azure Service Bus Integration
-#1. Overview
+## Ticket Event System – Azure Service Bus Integration
+
+# 1. Overview
 
 The Ticket Event System demonstrates an event-driven architecture using .NET 8, Azure Service Bus Topics, and Azure Functions.
 It simulates a ticketing workflow where messages are published to a Service Bus topic and processed selectively based on their properties.
 All authentication is handled through Azure Active Directory (Azure AD) instead of connection strings.
 
-#2. Architecture
+# 2. Architecture
 Components
 
 TicketSender – .NET 8 console app that publishes Ticket messages to an Azure Service Bus topic named logtopic.
@@ -35,7 +36,7 @@ TicketSender  →  Service Bus Topic (logtopic)
                                 ↓
                         TicketProcessor (Function)
 
-#3. Authentication
+# 3. Authentication
 
 Local Development: Uses the signed-in Azure user (az login).
 
@@ -43,7 +44,7 @@ Azure Deployment: Uses the Function App’s system-assigned managed identity.
 
 No connection strings are stored in code or configuration.
 
-#4. Local Setup
+# 4. Local Setup
 Requirements
 
 Azure subscription
@@ -89,7 +90,7 @@ dotnet run
 
 Only error tickets with low priority will trigger the Function.
 
-#5. Deployment to Azure
+# 5. Deployment to Azure
 
 Enable System-Assigned Managed Identity on the Function App.
 
@@ -102,7 +103,7 @@ servicebusnamespace1071_SERVICEBUS__fullyQualifiedNamespace = servicebusnamespac
 
 Redeploy — no code changes required.
 
-#6. Project Structure
+# 6. Project Structure
 ticketeventsystem/
 │
 ├── TicketSender/
@@ -117,7 +118,7 @@ ticketeventsystem/
 │
 └── ticketeventsystem.sln
 
-#7. Technologies
+# 7. Technologies
 
 .NET 8
 
